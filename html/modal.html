@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Modal Scroll Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        min-height: 200vh; /* 페이지를 길게 만들기 위해 최소 높이 설정 */
+      }
+      #modal-wrapper {
+        z-index: 1000; /* 높은 z-index 값 설정 */
+      }
+      #dialog {
+        z-index: 1001; /* modal-wrapper보다 높은 z-index 값 설정 */
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="text-2xl font-bold mb-4">Modal Scroll Test</h1>
+
+    <button id="open" class="mb-4 rounded bg-blue-500 px-4 py-2 text-white font-bold">Open Modal</button>
+
+    <!-- 스크롤을 위한 더미 콘텐츠 -->
+    <div class="space-y-4">
+      <p>Scroll down to see more content...</p>
+      <!-- 여러 개의 단락을 추가하여 페이지를 길게 만듭니다 -->
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua.</p>
+      <!-- 이 부분을 여러 번 반복하여 충분한 콘텐츠를 만듭니다 -->
+    </div>
+
+    <div id="modal-wrapper" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm hidden">
+      <div class="flex justify-center items-center h-full">
+        <dialog id="dialog" class="rounded-xl bg-white p-6 shadow-3xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+          <h2 class="text-xl font-bold mb-4">Modal Title</h2>
+          <p class="mb-4">This is the modal content. You can add more text here to test scrolling within the modal.</p>
+          <p class="mb-4">This is the modal content. You can add more text here to test scrolling within the modal.</p>
+          <p class="mb-4">This is the modal content. You can add more text here to test scrolling within the modal.</p>
+          <p class="mb-4">This is the modal content. You can add more text here to test scrolling within the modal.</p>
+          <p class="mb-4">This is the modal content. You can add more text here to test scrolling within the modal.</p>
+          <!-- 모달 내부의 스크롤을 테스트하기 위한 추가 콘텐츠 -->
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+            dolore magna aliqua.</p>
+          <!-- 이 부분을 여러 번 반복하여 모달 내부에 충분한 콘텐츠를 만듭니다 -->
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">1</button>
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">2</button>
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">3</button>
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">4</button>
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">5</button>
+          <button class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">6</button>
+          <button id="close" class="mt-4 rounded bg-gray-200 px-4 py-2 text-sm font-bold">Close</button>
+        </dialog>
+      </div>
+    </div>
+
+    <script>
+      const modalWrapper = document.getElementById('modal-wrapper');
+      const dialog = document.getElementById('dialog');
+      const openButton = document.getElementById('open');
+      const closeButton = document.getElementById('close');
+
+      function openModal() {
+        modalWrapper.classList.remove('hidden');
+        dialog.showModal();
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        console.log('Closing modal');
+        modalWrapper.classList.add('hidden');
+        dialog.close();
+        document.body.style.overflow = '';
+        openButton.focus();
+      }
+
+      openButton.addEventListener('click', openModal);
+      closeButton.addEventListener('click', closeModal);
+
+      // 수정된 부분: mousedown 이벤트 사용 및 dialog 클릭 방지
+      modalWrapper.addEventListener('click', function(event) {
+        console.log('Clicked on modalWrapper');
+        // dialog의 영역을 확인
+        const rect = dialog.getBoundingClientRect();
+        const isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height
+          && rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+
+        if (!isInDialog) {
+          console.log('Clicked on backdrop');
+          closeModal();
+        }
+      });
+
+
+      // Add event listener for the Esc key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && !modalWrapper.classList.contains('hidden')) {
+          closeModal();
+        }
+      });
+
+      // Prevent the default Esc key behavior of the dialog
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        closeModal();
+      });
+    </script>
+  </body>
+</html>
